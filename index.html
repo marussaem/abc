@@ -3,303 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>우리 반 스마트 학급일지 📒</title>
+    <title>스마트 학급일지 PRO</title>
     <style>
-        /* 깔끔한 블랙 앤 화이트 테마 설정 */
-        :root {
-            --bg: #ffffff; /* 완전한 흰색 배경 */
-            --sidebar-bg: #fafafa; /* 아주 연한 회색 사이드바 */
-            --primary: #000000; /* 주요 강조색은 블랙 */
-            --text: #333333; /* 본문 텍스트는 짙은 회색 */
-            --border: #eeeeee; /* 테두리는 아주 연한 회색 */
-            --tag-bg: #f5f5f5; /* 일정 태그 배경 */
-        }
+        :root { --bg: #ffffff; --sidebar-bg: #fafafa; --primary: #000000; --text: #333333; --border: #eeeeee; --tag-bg: #f5f5f5; --danger: #666666; }
+        body { font-family: 'Pretendard', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; display: flex; min-height: 100vh; }
+        
+        /* 사이드바 */
+        .sidebar { width: 240px; background: var(--sidebar-bg); padding: 40px 20px; display: flex; flex-direction: column; gap: 6px; position: fixed; height: 100vh; border-right: 1px solid var(--border); box-sizing: border-box; z-index: 100; }
+        .sidebar h2 { font-size: 1.1rem; margin-bottom: 25px; text-align: center; color: var(--primary); font-weight: 700; cursor: pointer; padding: 8px; border-radius: 8px; }
+        .sidebar h2:hover { background: #ebebeb; }
+        
+        .menu-btn { padding: 12px 18px; border: none; background: transparent; color: #888; text-align: left; cursor: pointer; border-radius: 12px; font-size: 0.9rem; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+        .menu-btn.active { background: #f0f0f0; color: var(--primary); font-weight: 600; }
+        .menu-btn:hover:not(.active) { background: #f5f5f5; }
 
-        body {
-            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            display: flex;
-            min-height: 100vh;
-        }
+        /* 메인 */
+        .main-content { flex: 1; margin-left: 240px; padding: 40px; }
+        .tab-panel { display: none; max-width: 1050px; margin: 0 auto; }
+        .tab-panel.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* 사이드바 스타일 - 깔끔한 B&W */
-        .sidebar {
-            width: 240px;
-            background: var(--sidebar-bg);
-            padding: 40px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            position: fixed;
-            height: 100vh;
-            border-right: 1px solid var(--border);
-            box-sizing: border-box;
-            z-index: 100;
-        }
+        .card { background: white; padding: 25px; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.02); margin-bottom: 20px; }
+        h1 { font-size: 1.4rem; margin-bottom: 25px; color: var(--primary); font-weight: 700; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 14px 12px; border-bottom: 1px solid #eee; text-align: center; font-size: 0.85rem; }
+        th { background: #fafafa; color: #999; }
+        
+        select, input, textarea { padding: 9px; border: 1px solid #eee; border-radius: 8px; outline: none; font-size: 0.85rem; font-family: inherit; }
+        .btn-add { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; }
+        .btn-danger { background: #fff; color: var(--danger); border: 1px solid var(--danger); padding: 8px 15px; border-radius: 8px; cursor: pointer; }
 
-        .sidebar h2 {
-            font-size: 1.1rem;
-            margin-bottom: 25px;
-            text-align: center;
-            color: var(--primary);
-            font-weight: 700;
-        }
-
-        .menu-btn {
-            padding: 12px 18px;
-            border: none;
-            background: transparent;
-            color: #888;
-            text-align: left;
-            cursor: pointer;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .menu-btn.active {
-            background: #f0f0f0;
-            color: var(--primary);
-            font-weight: 600;
-        }
-
-        .menu-btn:hover:not(.active) {
-            background: #f5f5f5;
-            color: #555;
-        }
-
-        /* 메인 콘텐츠 영역 */
-        .main-content {
-            flex: 1;
-            margin-left: 240px;
-            padding: 40px;
-        }
-
-        .tab-panel {
-            display: none;
-            max-width: 1050px;
-            margin: 0 auto;
-        }
-
-        .tab-panel.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* 카드 및 테이블 스타일 */
-        .card {
-            background: white;
-            padding: 25px;
-            border-radius: 20px;
-            border: 1px solid var(--border);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-            margin-bottom: 20px;
-        }
-
-        h1 {
-            font-size: 1.4rem;
-            margin-bottom: 25px;
-            color: var(--primary);
-            font-weight: 700;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-
-        th, td {
-            padding: 14px 12px;
-            border-bottom: 1px solid #eee;
-            text-align: center;
-            font-size: 0.85rem;
-        }
-
-        th {
-            background: #fafafa;
-            color: #999;
-            font-weight: 500;
-        }
-
-        select, input, textarea {
-            padding: 9px;
-            border: 1px solid #eee;
-            border-radius: 8px;
-            outline: none;
-            font-family: inherit;
-            font-size: 0.85rem;
-            background: #fdfdfd;
-        }
-
-        select:focus, input:focus {
-            border-color: #aaa;
-        }
-
-        /* 버튼 스타일 - 깔끔한 B&W */
-        .btn-add {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.85rem;
-            transition: background 0.2s;
-        }
-
-        .btn-add:hover {
-            background: #333;
-        }
-
-        .btn-excel {
-            background: #f5f5f5;
-            color: #555;
-            border: 1px solid #ddd;
-            padding: 10px 20px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.85rem;
-            transition: background 0.2s;
-        }
-
-        .btn-excel:hover {
-            background: #eee;
-        }
-
-        /* 달력 스타일 */
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
-        }
-
-        .day {
-            background: #fff;
-            border: 1px solid #f0f0f0;
-            min-height: 85px;
-            padding: 10px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .day.today {
-            border: 2px solid #000 !important;
-            background: #fafafa;
-        }
-
-        .day:hover {
-            background: #fbfbfb;
-            border-color: #ccc;
-        }
-
-        .num {
-            font-size: 0.9rem;
-            font-weight: bold;
-            color: #aaa;
-        }
-
-        .sun .num { color: #fcc; } /* 일요일 색상 */
-        .sat .num { color: #ccf; } /* 토요일 색상 */
-
-        .event-tag {
-            font-size: 0.7rem;
-            background: var(--tag-bg);
-            color: #777;
-            padding: 3px 6px;
-            border-radius: 4px;
-            margin-top: 5px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            border: 1px solid #eee;
-        }
+        /* 달력 및 주간메모 */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+        .day { background: #fff; border: 1px solid #f0f0f0; min-height: 85px; padding: 10px; border-radius: 10px; cursor: pointer; }
+        .day.today { border: 2px solid #000; background: #fafafa; }
+        .num { font-size: 0.9rem; font-weight: bold; color: #aaa; }
+        .event-tag { font-size: 0.7rem; background: var(--tag-bg); color: #777; padding: 3px 6px; border-radius: 4px; margin-top: 5px; overflow: hidden; white-space: nowrap; border: 1px solid #eee; }
+        
+        .weekly-input-group { margin-bottom: 15px; }
+        .weekly-label { font-size: 0.75rem; color: #999; margin-bottom: 5px; display: block; }
+        .weekly-textarea { width: 100%; height: 60px; resize: none; border: 1px solid #eee; border-radius: 10px; padding: 8px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
 <nav class="sidebar">
-    <h2>🧸 스마트 학급일지</h2>
-    <button class="menu-btn active" onclick="openTab(event, 'tab-students')">🌷 학생 관리</button>
-    <div style="margin: 12px 0; border-top: 1px solid #f0f0f0;"></div>
-    <button class="menu-btn" onclick="openTab(event, 'tab-schedule')">📅 연간 일정</button>
-    <div style="margin: 12px 0; border-top: 1px solid #f0f0f0;"></div>
-    <button class="menu-btn" onclick="openTab(event, 'tab-attendance')">✅ 출석 기록</button>
-    <button class="menu-btn" onclick="openTab(event, 'tab-evaluation')">📝 평가 기록</button>
-    <button class="menu-btn" onclick="openTab(event, 'tab-counsel')">💬 상담 기록</button>
+    <h2 id="app-title" onclick="editTitle()">학급일지</h2>
+    <div id="sidebar-menus"></div>
+    <div style="margin-top: auto; border-top: 1px solid #f0f0f0; padding-top: 10px;">
+        <button class="menu-btn" onclick="openTab(event, 'tab-settings')">⚙️ 설정</button>
+    </div>
 </nav>
 
 <main class="main-content">
     <section id="tab-students" class="tab-panel active">
-        <h1>🌷 학생 명단 관리</h1>
+        <h1 id="title-students">학생 명단 관리</h1>
         <div class="card">
-            <div style="margin-bottom: 25px; display: flex; gap: 8px;">
-                <input type="text" id="new-name" placeholder="학생 성함 입력" style="flex:1">
+            <div style="display: flex; gap: 8px;">
+                <input type="text" id="new-name" placeholder="이름 입력" style="flex:1">
                 <button class="btn-add" onclick="addStudent()">추가</button>
                 <input type="file" id="excel-file" accept=".csv" style="display:none" onchange="importCSV(this)">
-                <button class="btn-excel" onclick="document.getElementById('excel-file').click()">CSV 불러오기</button>
+                <button onclick="document.getElementById('excel-file').click()" style="cursor:pointer; background:none; border:1px solid #ddd; border-radius:10px; padding:0 15px;">CSV 불러오기</button>
             </div>
             <div id="student-list-display" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px;"></div>
         </div>
     </section>
 
     <section id="tab-schedule" class="tab-panel">
-        <h1>📅 연간 일정</h1>
+        <h1 id="title-schedule">연간 일정</h1>
         <div style="display:flex; gap:20px;">
             <div class="card" style="flex:2.5;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                     <button onclick="moveMonth(-1)">◀</button>
-                    <h3 id="cal-title" style="color: #000; font-weight: 700;"></h3>
+                    <h3 id="cal-title"></h3>
                     <button onclick="moveMonth(1)">▶</button>
                 </div>
                 <div id="calendar-grid" class="calendar-grid"></div>
             </div>
             <div class="card" style="flex:1; background:#fafafa;">
-                <h4 style="margin: 0 0 15px 0; color: #555; border-bottom: 1px solid #eee; padding-bottom: 8px;">주간 메모</h4>
-                <div id="weekly-memos"></div>
+                <h4 id="weekly-memo-title">4월 주간 메모</h4>
+                <div id="weekly-memos-container"></div>
             </div>
         </div>
     </section>
 
     <section id="tab-attendance" class="tab-panel">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
-            <h1>✅ 출석 기록</h1>
-            <button class="btn-add" onclick="saveAttendance()">오늘의 기록 저장</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h1 id="title-attendance">출석 기록</h1>
+            <button class="btn-add" onclick="saveAttendance()">기록 저장</button>
         </div>
         <div class="card">
             <input type="date" id="attn-date" onchange="renderAttendanceTable()">
             <table id="attn-table">
-                <thead><tr><th width="50">번호</th><th width="100">이름</th><th>출결 형태</th><th>사유(비고)</th><th>서류</th></tr></thead>
+                <thead><tr><th>번호</th><th>이름</th><th>출결 형태</th><th>사유(비고)</th><th>서류</th></tr></thead>
                 <tbody></tbody>
             </table>
         </div>
     </section>
 
     <section id="tab-evaluation" class="tab-panel">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
-            <h1>📝 교과 평가 기록</h1>
-            <button class="btn-add" onclick="saveEvaluation()">평가 결과 저장</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h1 id="title-evaluation">평가 기록</h1>
+            <button class="btn-add" onclick="saveEvaluation()">결과 저장</button>
         </div>
         <div class="card">
             <div style="display:flex; gap:10px; margin-bottom:20px;">
-                <select id="eval-subject" onchange="renderEvaluationTable()">
-                    <option>국어</option><option>수학</option><option>사회</option><option>과학</option>
-                    <option>영어</option><option>음악</option><option>미술</option><option>체육</option><option>실과</option>
-                </select>
-                <input type="text" id="eval-topic" placeholder="평가 주제 입력" onchange="renderEvaluationTable()">
+                <select id="eval-subject" onchange="renderEvaluationTable()"></select>
+                <input type="text" id="eval-topic" placeholder="평가 주제(필수)" onchange="renderEvaluationTable()">
             </div>
             <table id="eval-table">
                 <thead><tr><th>번호</th><th>이름</th><th>결과</th><th>비고</th></tr></thead>
@@ -309,79 +120,168 @@
     </section>
 
     <section id="tab-counsel" class="tab-panel">
-        <h1>💬 상담 기록</h1>
+        <h1 id="title-counsel">상담 기록</h1>
         <div class="card">
             <div style="display:flex; gap:10px; margin-bottom:15px;">
                 <select id="counsel-student-select"></select>
                 <input type="date" id="counsel-date">
             </div>
-            <textarea id="counsel-text" style="width:100%; height:120px; margin-bottom:10px;" placeholder="상담 내용을 입력하세요."></textarea>
+            <textarea id="counsel-text" style="width:100%; height:100px; margin-bottom:10px;" placeholder="상담 내용"></textarea>
             <button class="btn-add" onclick="saveCounsel()">상담 저장</button>
-            <div id="counsel-list" style="margin-top:25px; display: flex; flex-direction: column; gap: 15px;"></div>
+            <div id="counsel-list" style="margin-top:20px; display:flex; flex-direction:column; gap:10px;"></div>
+        </div>
+    </section>
+
+    <section id="tab-settings" class="tab-panel">
+        <h1>⚙️ 설정</h1>
+        <div class="card">
+            <h3>메뉴 및 과목 설정</h3>
+            <div id="menu-settings-list" style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;"></div>
+            <label style="font-size:0.75rem; color:#999;">과목 (쉼표 구분)</label><br>
+            <textarea id="subject-setting" style="width:100%; height:60px;"></textarea>
+            <button class="btn-add" style="margin-top:10px;" onclick="saveSettings()">설정 적용</button>
+        </div>
+        <div class="card" style="border-color: #ddd;">
+            <h3>데이터 관리</h3>
+            <button class="btn-danger" onclick="resetAllData()">전체 데이터 초기화</button>
         </div>
     </section>
 </main>
 
 <script>
-    // 새 버전(v16)으로 데이터를 초기화하여 이전 컬러 설정을 지웁니다.
-    let db = JSON.parse(localStorage.getItem('smartDiary_v16')) || {
-        students: [], events: {}, counsels: [], attnData: {}, evalData: {}
+    // 유틸리티: 날짜를 YYYY-MM-DD 형식으로 포맷팅 (0 패딩 포함)
+    const formatDate = (y, m, d) => `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    const getMonthKey = (y, m) => `${y}-${String(m + 1).padStart(2, '0')}`;
+
+    const defaultData = {
+        title: "스마트 학급일지 PRO",
+        menuNames: { students: "🌷 학생 관리", schedule: "📅 연간 일정", attendance: "✅ 출석 기록", evaluation: "📝 평가 기록", counsel: "💬 상담 기록" },
+        subjects: ["국어", "수학", "사회", "과학", "영어", "창체"],
+        students: [], events: {}, counsels: [], attnData: {}, evalData: {}, weeklyMemos: {}
     };
 
+    let db = JSON.parse(localStorage.getItem('smartDiary_v19')) || defaultData;
     const today = new Date();
     let curCal = { y: today.getFullYear(), m: today.getMonth() };
 
     window.onload = () => {
-        document.getElementById('attn-date').valueAsDate = today;
-        document.getElementById('counsel-date').valueAsDate = today;
+        document.getElementById('attn-date').value = formatDate(today.getFullYear(), today.getMonth(), today.getDate());
+        document.getElementById('counsel-date').value = formatDate(today.getFullYear(), today.getMonth(), today.getDate());
+        initSettingsUI();
         updateUI();
     };
 
     function saveDB() {
-        localStorage.setItem('smartDiary_v16', JSON.stringify(db));
+        localStorage.setItem('smartDiary_v19', JSON.stringify(db));
         updateUI();
     }
 
     function updateUI() {
-        // 학생 리스트
-        document.getElementById('student-list-display').innerHTML = db.students.map((s, i) => `
-            <div class="card" style="padding: 10px 15px; display:flex; align-items:center; gap:8px; margin-bottom:0; border-radius: 12px; border-color: #eee;">
-                <b>${i+1}</b> ${s} <span style="color:#ff8b94; cursor:pointer;" onclick="removeStudent(${i})">×</span>
-            </div>
-        `).join("");
-        document.getElementById('counsel-student-select').innerHTML = db.students.map(s => `<option>${s}</option>`).join("");
+        document.getElementById('app-title').textContent = db.title;
+        document.title = db.title;
+
+        // 사이드바 및 메뉴 이름
+        const sidebar = document.getElementById('sidebar-menus');
+        sidebar.innerHTML = '';
+        Object.keys(db.menuNames).forEach(key => {
+            const btn = document.createElement('button');
+            btn.className = `menu-btn ${document.getElementById('tab-'+key).classList.contains('active') ? 'active' : ''}`;
+            btn.textContent = db.menuNames[key];
+            btn.onclick = (e) => openTab(e, 'tab-' + key);
+            sidebar.appendChild(btn);
+            
+            const titleEl = document.getElementById(`title-${key}`);
+            if(titleEl) titleEl.textContent = db.menuNames[key];
+        });
+
+        // 과목 설정
+        const evalSub = document.getElementById('eval-subject');
+        evalSub.innerHTML = '';
+        db.subjects.forEach(s => {
+            const opt = document.createElement('option');
+            opt.textContent = s;
+            evalSub.appendChild(opt);
+        });
+
+        // 학생 목록 (보안 강화: textContent 사용)
+        const listDisp = document.getElementById('student-list-display');
+        listDisp.innerHTML = '';
+        db.students.forEach((s, i) => {
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.style.cssText = 'padding:10px; display:flex; align-items:center; gap:8px; margin-bottom:0; border-radius:10px;';
+            
+            const b = document.createElement('b'); b.textContent = i + 1;
+            const spanName = document.createElement('span'); spanName.textContent = s;
+            const del = document.createElement('span');
+            del.textContent = '×';
+            del.style.cssText = 'color:#999; cursor:pointer; margin-left:5px; font-weight:bold;';
+            del.onclick = () => removeStudent(i);
+
+            div.append(b, spanName, del);
+            listDisp.appendChild(div);
+        });
+
+        const counselSelect = document.getElementById('counsel-student-select');
+        counselSelect.innerHTML = '';
+        db.students.forEach(s => {
+            const opt = document.createElement('option');
+            opt.textContent = s;
+            counselSelect.appendChild(opt);
+        });
         
         renderAttendanceTable();
         renderEvaluationTable();
         refreshCounselList();
     }
 
-    // 출석 렌더링
+    // 학생 관리 (중복 체크 추가)
+    function addStudent() {
+        const input = document.getElementById('new-name');
+        const name = input.value.trim();
+        if(!name) return;
+        if(db.students.includes(name)) {
+            alert("이미 등록된 학생입니다.");
+            return;
+        }
+        db.students.push(name);
+        input.value = "";
+        saveDB();
+    }
+
+    function removeStudent(i) {
+        if(confirm("해당 학생을 삭제하시겠습니까? 관련 기록은 유지되나 목록에서 제외됩니다.")) {
+            db.students.splice(i, 1);
+            saveDB();
+        }
+    }
+
+    // 출석 (textContent로 보안 강화)
     function renderAttendanceTable() {
         const date = document.getElementById('attn-date').value;
-        const savedData = db.attnData[date] || {};
+        const saved = db.attnData[date] || {};
         const tbody = document.querySelector('#attn-table tbody');
-        tbody.innerHTML = db.students.map((s, i) => {
-            const row = savedData[s] || { type: '출석', note: '', doc: false };
-            return `
-                <tr>
-                    <td>${i+1}</td><td><strong>${s}</strong></td>
-                    <td><select class="at-type"><option ${row.type==='출석'?'selected':''}>출석</option>
-                        <option ${row.type==='질병결석'?'selected':''}>질병결석</option>
-                        <option ${row.type==='인정결석'?'selected':''}>인정결석</option>
-                        <option ${row.type==='무단결석'?'selected':''}>무단결석</option></select></td>
-                    <td><input type="text" class="at-note" value="${row.note}" style="width:90%"></td>
-                    <td><input type="checkbox" class="at-doc" ${row.doc?'checked':''}></td>
-                </tr>`;
-        }).join("");
+        tbody.innerHTML = '';
+        db.students.forEach((s, i) => {
+            const d = saved[s] || { type: '출석', note: '', doc: false };
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${i+1}</td><td class="name-cell"></td>
+                <td><select class="at-type"><option>출석</option><option>질병결석</option><option>인정결석</option><option>무단결석</option></select></td>
+                <td><input type="text" class="at-note" style="width:90%"></td>
+                <td><input type="checkbox" class="at-doc"></td>`;
+            tr.querySelector('.name-cell').textContent = s;
+            tr.querySelector('.at-type').value = d.type;
+            tr.querySelector('.at-note').value = d.note;
+            tr.querySelector('.at-doc').checked = d.doc;
+            tbody.appendChild(tr);
+        });
     }
 
     function saveAttendance() {
         const date = document.getElementById('attn-date').value;
-        const rows = document.querySelectorAll('#attn-table tbody tr');
         db.attnData[date] = {};
-        rows.forEach(row => {
-            const name = row.cells[1].innerText;
+        document.querySelectorAll('#attn-table tbody tr').forEach(row => {
+            const name = row.querySelector('.name-cell').textContent;
             db.attnData[date][name] = {
                 type: row.querySelector('.at-type').value,
                 note: row.querySelector('.at-note').value,
@@ -391,59 +291,139 @@
         saveDB(); alert("저장되었습니다.");
     }
 
-    // 평가 렌더링
+    // 평가 (키 구조 개선: 주제 필수)
     function renderEvaluationTable() {
-        const key = document.getElementById('eval-subject').value + "_" + document.getElementById('eval-topic').value;
-        const savedData = db.evalData[key] || {};
+        const sub = document.getElementById('eval-subject').value;
+        const topic = document.getElementById('eval-topic').value.trim();
+        const key = sub + "_" + (topic || "기본");
+        const saved = db.evalData[key] || {};
         const tbody = document.querySelector('#eval-table tbody');
-        tbody.innerHTML = db.students.map((s, i) => {
-            const row = savedData[s] || { score: '매우잘함', note: '' };
-            return `
-                <tr>
-                    <td>${i+1}</td><td><strong>${s}</strong></td>
-                    <td><select class="ev-score">
-                        <option ${row.score==='매우잘함'?'selected':''}>매우잘함</option>
-                        <option ${row.score==='잘함'?'selected':''}>잘함</option>
-                        <option ${row.score==='보통'?'selected':''}>보통</option>
-                        <option ${row.score==='노력요함'?'selected':''}>노력요함</option></select></td>
-                    <td><input type="text" class="ev-note" value="${row.note}" style="width:90%"></td>
-                </tr>`;
-        }).join("");
+        tbody.innerHTML = '';
+        db.students.forEach((s, i) => {
+            const d = saved[s] || { score: '매우잘함', note: '' };
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${i+1}</td><td class="name-cell"></td>
+                <td><select class="ev-score"><option>매우잘함</option><option>잘함</option><option>보통</option><option>노력요함</option></select></td>
+                <td><input type="text" class="ev-note" style="width:90%"></td>`;
+            tr.querySelector('.name-cell').textContent = s;
+            tr.querySelector('.ev-score').value = d.score;
+            tr.querySelector('.ev-note').value = d.note;
+            tbody.appendChild(tr);
+        });
     }
 
     function saveEvaluation() {
-        const key = document.getElementById('eval-subject').value + "_" + document.getElementById('eval-topic').value;
-        const rows = document.querySelectorAll('#eval-table tbody tr');
+        const sub = document.getElementById('eval-subject').value;
+        const topic = document.getElementById('eval-topic').value.trim();
+        if(!topic) { alert("평가 주제를 입력해주세요."); return; }
+        const key = sub + "_" + topic;
         db.evalData[key] = {};
-        rows.forEach(row => {
-            const name = row.cells[1].innerText;
+        document.querySelectorAll('#eval-table tbody tr').forEach(row => {
+            const name = row.querySelector('.name-cell').textContent;
             db.evalData[key][name] = {
                 score: row.querySelector('.ev-score').value,
                 note: row.querySelector('.ev-note').value
             };
         });
-        saveDB(); alert("저장되었습니다.");
+        saveDB(); alert("평가 결과가 저장되었습니다.");
     }
 
-    /* --- CSV 가져오기 로직 (명단 필터링 유지) --- */
-    function importCSV(input) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const names = e.target.result.split(/[\n,]/)
-                .map(n => n.trim().replace(/^[0-9]+[\.\-\s]*/g, '')) // 숫자와 온점 제거 로직
-                .filter(n => n !== "");
-
-            db.students = [...new Set([...db.students, ...names])]; 
-            saveDB();
-            alert("명단이 B&W 스타일로 연동되었습니다.");
-        };
-        reader.readAsText(input.files[0]);
-        input.value = ""; 
+    // 달력 및 주간 메모 (주간 메모 기능 추가)
+    function renderCal() {
+        const grid = document.getElementById('calendar-grid');
+        document.getElementById('cal-title').textContent = `${curCal.y}년 ${curCal.m + 1}월`;
+        grid.innerHTML = "";
+        const first = new Date(curCal.y, curCal.m, 1).getDay();
+        const last = new Date(curCal.y, curCal.m + 1, 0).getDate();
+        ['일','월','화','수','목','금','토'].forEach(d => {
+            const div = document.createElement('div');
+            div.style.cssText = 'text-align:center; font-size:0.75rem; color:#bbb;';
+            div.textContent = d;
+            grid.appendChild(div);
+        });
+        for(let i=0; i<first; i++) grid.appendChild(document.createElement('div'));
+        for(let d=1; d<=last; d++) {
+            const dateStr = formatDate(curCal.y, curCal.m, d);
+            const isT = (today.getFullYear()===curCal.y && today.getMonth()===curCal.m && today.getDate()===d);
+            const div = document.createElement('div');
+            div.className = `day ${isT?'today':''}`;
+            div.onclick = () => addEvent(dateStr);
+            div.innerHTML = `<div class="num">${d}</div>`;
+            if(db.events[dateStr]) {
+                const tag = document.createElement('div');
+                tag.className = 'event-tag';
+                tag.textContent = db.events[dateStr];
+                div.appendChild(tag);
+            }
+            grid.appendChild(div);
+        }
+        renderWeeklyMemos();
     }
 
-    function addStudent() { const n = document.getElementById('new-name'); if(n.value) { db.students.push(n.value.trim()); n.value=""; saveDB(); } }
-    function removeStudent(i) { if(confirm("삭제할까요?")) { db.students.splice(i, 1); saveDB(); } }
-    
+    function renderWeeklyMemos() {
+        const monthKey = getMonthKey(curCal.y, curCal.m);
+        document.getElementById('weekly-memo-title').textContent = `${curCal.m + 1}월 주간 메모`;
+        const container = document.getElementById('weekly-memos-container');
+        container.innerHTML = '';
+        const savedMemos = db.weeklyMemos[monthKey] || ["", "", "", "", ""];
+        
+        for(let i=0; i<5; i++) {
+            const group = document.createElement('div');
+            group.className = 'weekly-input-group';
+            group.innerHTML = `<span class="weekly-label">${i+1}주차</span>
+                <textarea class="weekly-textarea" placeholder="일정을 입력하세요">${savedMemos[i] || ""}</textarea>`;
+            group.querySelector('textarea').onchange = (e) => {
+                if(!db.weeklyMemos[monthKey]) db.weeklyMemos[monthKey] = ["", "", "", "", ""];
+                db.weeklyMemos[monthKey][i] = e.target.value;
+                localStorage.setItem('smartDiary_v19', JSON.stringify(db));
+            };
+            container.appendChild(group);
+        }
+    }
+
+    function moveMonth(n) { curCal.m += n; if(curCal.m<0){curCal.m=11;curCal.y--;} else if(curCal.m>11){curCal.m=0;curCal.y++;} renderCal(); }
+    function addEvent(d) { const val = prompt("일정 입력", db.events[d]||""); if(val!==null){db.events[d]=val; saveDB(); renderCal();}}
+
+    // 상담 기록
+    function saveCounsel() {
+        const text = document.getElementById('counsel-text').value.trim();
+        if(!text) return;
+        db.counsels.push({ name: document.getElementById('counsel-student-select').value, date: document.getElementById('counsel-date').value, text: text });
+        document.getElementById('counsel-text').value = ""; saveDB();
+    }
+    function refreshCounselList() {
+        const list = document.getElementById('counsel-list');
+        list.innerHTML = '';
+        db.counsels.slice().reverse().forEach(c => {
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.style.cssText = 'font-size:0.85rem; margin-bottom:0; border-radius:12px;';
+            const b = document.createElement('b'); b.textContent = `${c.date} [${c.name}]`;
+            const p = document.createElement('p'); p.style.cssText = 'margin:5px 0 0 0; color:#555;'; p.textContent = c.text;
+            div.append(b, p);
+            list.appendChild(div);
+        });
+    }
+
+    // 설정 및 공통
+    function initSettingsUI() {
+        const menuList = document.getElementById('menu-settings-list');
+        menuList.innerHTML = '';
+        Object.keys(db.menuNames).forEach(key => {
+            const div = document.createElement('div');
+            div.innerHTML = `<label style="font-size:0.75rem; color:#999;">${key}</label><br>
+                <input type="text" id="set-menu-${key}" value="${db.menuNames[key]}" style="width:90%">`;
+            menuList.appendChild(div);
+        });
+        document.getElementById('subject-setting').value = db.subjects.join(", ");
+    }
+
+    function saveSettings() {
+        Object.keys(db.menuNames).forEach(key => { db.menuNames[key] = document.getElementById(`set-menu-${key}`).value; });
+        db.subjects = document.getElementById('subject-setting').value.split(",").map(s => s.trim()).filter(s => s);
+        saveDB(); alert("설정이 적용되었습니다.");
+    }
+
     function openTab(e, id) {
         document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
@@ -451,44 +431,18 @@
         if(id === 'tab-schedule') renderCal();
     }
 
-    function renderCal() {
-        const grid = document.getElementById('calendar-grid');
-        document.getElementById('cal-title').innerText = `${curCal.y}년 ${curCal.m + 1}월`;
-        grid.innerHTML = "";
-        const first = new Date(curCal.y, curCal.m, 1).getDay();
-        const last = new Date(curCal.y, curCal.m + 1, 0).getDate();
-        
-        ['일','월','화','수','목','금','토'].forEach((d, i) => {
-            let color = "#bbb";
-            if(i===0) color="#fcc"; // 일요일 빨강(연하게)
-            if(i===6) color="#ccf"; // 토요일 파랑(연하게)
-            grid.innerHTML += `<div style="text-align:center;font-size:0.75rem;color:${color};padding-bottom:10px;">${d}</div>`
-        });
-        
-        for(let i=0; i<first; i++) grid.innerHTML += `<div></div>`;
-        for(let d=1; d<=last; d++) {
-            const dateStr = `${curCal.y}-${curCal.m+1}-${d}`;
-            const isToday = (today.getFullYear()===curCal.y && today.getMonth()===curCal.m && today.getDate()===d);
-            const dayOfWeek = new Date(curCal.y, curCal.m, d).getDay();
-            let specialClass = '';
-            if(dayOfWeek===0) specialClass = 'sun';
-            if(dayOfWeek===6) specialClass = 'sat';
-            
-            grid.innerHTML += `<div class="day ${isToday?'today':''} ${specialClass}" onclick="addEvent('${dateStr}')">
-                <div class="num">${d}</div>
-                ${db.events[dateStr] ? `<div class="event-tag">${db.events[dateStr]}</div>` : ''}
-            </div>`;
-        }
+    function importCSV(input) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const names = e.target.result.split(/[\n,]/).map(n => n.trim().replace(/^[0-9]+[\.\-\s]*/g, '')).filter(n => n);
+            db.students = [...new Set([...db.students, ...names])];
+            saveDB(); alert("가져오기 완료");
+        };
+        reader.readAsText(input.files[0]);
     }
-    function moveMonth(n) { curCal.m += n; if(curCal.m<0){curCal.m=11;curCal.y--;} else if(curCal.m>11){curCal.m=0;curCal.y++;} renderCal(); }
-    function addEvent(d) { const val = prompt("일정", db.events[d]||""); if(val!==null){db.events[d]=val; saveDB(); renderCal();}}
-    function saveCounsel() {
-        db.counsels.push({ name: document.getElementById('counsel-student-select').value, date: document.getElementById('counsel-date').value, text: document.getElementById('counsel-text').value });
-        document.getElementById('counsel-text').value = ""; saveDB();
-    }
-    function refreshCounselList() {
-        document.getElementById('counsel-list').innerHTML = db.counsels.slice().reverse().map(c => `<div class="card" style="font-size:0.85rem; margin-bottom:0; border-radius: 12px;"><b>${c.date} [${c.name}]</b><br><p style="margin:5px 0 0 0; color:#555;">${c.text}</p></div>`).join("");
-    }
+
+    function resetAllData() { if(confirm("모든 데이터를 초기화하시겠습니까?")) { localStorage.removeItem('smartDiary_v19'); location.reload(); } }
+    function editTitle() { const t = prompt("제목 수정", db.title); if(t) { db.title = t; saveDB(); } }
 </script>
 </body>
 </html>
