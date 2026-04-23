@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>스마트 학급일지 PRO</title>
+    <title>스마트 학급일지 PRO+</title>
     <style>
         :root { --bg: #ffffff; --sidebar-bg: #fafafa; --primary: #000000; --text: #333333; --border: #eeeeee; --tag-bg: #f5f5f5; --danger: #666666; }
         body { font-family: 'Pretendard', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; display: flex; min-height: 100vh; }
@@ -31,18 +31,24 @@
         th { background: #fafafa; color: #999; }
         
         select, input, textarea { padding: 9px; border: 1px solid #eee; border-radius: 8px; outline: none; font-size: 0.85rem; font-family: inherit; }
-        .btn-add { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; }
-        .btn-danger { background: #fff; color: var(--danger); border: 1px solid var(--danger); padding: 8px 15px; border-radius: 8px; cursor: pointer; }
+        
+        /* 버튼 공통 스타일 */
+        .btn-add { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: 0.2s; }
+        .btn-add:hover { background: #333; }
+        .btn-outline { background: #fff; color: var(--primary); border: 1px solid var(--border); padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: 0.2s; }
+        .btn-outline:hover { background: #f9f9f9; border-color: #ccc; }
+        .btn-danger { background: #fff; color: var(--danger); border: 1px solid #ccc; padding: 8px 15px; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .btn-danger:hover { border-color: var(--danger); }
 
         /* 달력 및 주간메모 */
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-        .day { background: #fff; border: 1px solid #f0f0f0; min-height: 85px; padding: 10px; border-radius: 10px; cursor: pointer; }
+        .day { background: #fff; border: 1px solid #f0f0f0; min-height: 85px; padding: 10px; border-radius: 10px; cursor: pointer; position: relative; }
         .day.today { border: 2px solid #000; background: #fafafa; }
         .num { font-size: 0.9rem; font-weight: bold; color: #aaa; }
-        .event-tag { font-size: 0.7rem; background: var(--tag-bg); color: #777; padding: 3px 6px; border-radius: 4px; margin-top: 5px; overflow: hidden; white-space: nowrap; border: 1px solid #eee; }
+        .event-tag { font-size: 0.7rem; background: var(--tag-bg); color: #555; padding: 4px 6px; border-radius: 4px; margin-top: 5px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; border: 1px solid #eee; font-weight: 500;}
         
         .weekly-input-group { margin-bottom: 15px; }
-        .weekly-label { font-size: 0.75rem; color: #999; margin-bottom: 5px; display: block; }
+        .weekly-label { font-size: 0.75rem; color: #999; margin-bottom: 5px; display: block; font-weight: 600; }
         .weekly-textarea { width: 100%; height: 60px; resize: none; border: 1px solid #eee; border-radius: 10px; padding: 8px; box-sizing: border-box; }
     </style>
 </head>
@@ -52,7 +58,7 @@
     <h2 id="app-title" onclick="editTitle()">학급일지</h2>
     <div id="sidebar-menus"></div>
     <div style="margin-top: auto; border-top: 1px solid #f0f0f0; padding-top: 10px;">
-        <button class="menu-btn" onclick="openTab(event, 'tab-settings')">⚙️ 설정</button>
+        <button class="menu-btn" onclick="openTab(event, 'tab-settings')">⚙️ 설정 및 백업</button>
     </div>
 </nav>
 
@@ -61,10 +67,10 @@
         <h1 id="title-students">학생 명단 관리</h1>
         <div class="card">
             <div style="display: flex; gap: 8px;">
-                <input type="text" id="new-name" placeholder="이름 입력" style="flex:1">
+                <input type="text" id="new-name" placeholder="이름 입력 후 엔터" style="flex:1" onkeypress="if(event.key==='Enter') addStudent()">
                 <button class="btn-add" onclick="addStudent()">추가</button>
                 <input type="file" id="excel-file" accept=".csv" style="display:none" onchange="importCSV(this)">
-                <button onclick="document.getElementById('excel-file').click()" style="cursor:pointer; background:none; border:1px solid #ddd; border-radius:10px; padding:0 15px;">CSV 불러오기</button>
+                <button class="btn-outline" onclick="document.getElementById('excel-file').click()">CSV 불러오기</button>
             </div>
             <div id="student-list-display" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px;"></div>
         </div>
@@ -75,14 +81,17 @@
         <div style="display:flex; gap:20px;">
             <div class="card" style="flex:2.5;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                    <button onclick="moveMonth(-1)">◀</button>
-                    <h3 id="cal-title"></h3>
-                    <button onclick="moveMonth(1)">▶</button>
+                    <div style="display:flex; gap:5px;">
+                        <button class="btn-outline" style="padding: 5px 10px;" onclick="moveMonth(-1)">◀</button>
+                        <button class="btn-outline" style="padding: 5px 15px;" onclick="goToToday()">오늘</button>
+                    </div>
+                    <h3 id="cal-title" style="margin:0;"></h3>
+                    <button class="btn-outline" style="padding: 5px 10px;" onclick="moveMonth(1)">▶</button>
                 </div>
                 <div id="calendar-grid" class="calendar-grid"></div>
             </div>
             <div class="card" style="flex:1; background:#fafafa;">
-                <h4 id="weekly-memo-title">4월 주간 메모</h4>
+                <h4 id="weekly-memo-title" style="margin-top:0; color:#333;">주간 메모</h4>
                 <div id="weekly-memos-container"></div>
             </div>
         </div>
@@ -91,7 +100,10 @@
     <section id="tab-attendance" class="tab-panel">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
             <h1 id="title-attendance">출석 기록</h1>
-            <button class="btn-add" onclick="saveAttendance()">기록 저장</button>
+            <div>
+                <button class="btn-outline" onclick="downloadCSV('attn-table', '출석기록')">엑셀 다운로드</button>
+                <button class="btn-add" onclick="saveAttendance()">기록 저장</button>
+            </div>
         </div>
         <div class="card">
             <input type="date" id="attn-date" onchange="renderAttendanceTable()">
@@ -105,12 +117,15 @@
     <section id="tab-evaluation" class="tab-panel">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
             <h1 id="title-evaluation">평가 기록</h1>
-            <button class="btn-add" onclick="saveEvaluation()">결과 저장</button>
+            <div>
+                <button class="btn-outline" onclick="downloadCSV('eval-table', '평가기록')">엑셀 다운로드</button>
+                <button class="btn-add" onclick="saveEvaluation()">결과 저장</button>
+            </div>
         </div>
         <div class="card">
             <div style="display:flex; gap:10px; margin-bottom:20px;">
                 <select id="eval-subject" onchange="renderEvaluationTable()"></select>
-                <input type="text" id="eval-topic" placeholder="평가 주제(필수)" onchange="renderEvaluationTable()">
+                <input type="text" id="eval-topic" placeholder="평가 주제(필수)" onchange="renderEvaluationTable()" style="flex:1;">
             </div>
             <table id="eval-table">
                 <thead><tr><th>번호</th><th>이름</th><th>결과</th><th>비고</th></tr></thead>
@@ -126,41 +141,52 @@
                 <select id="counsel-student-select"></select>
                 <input type="date" id="counsel-date">
             </div>
-            <textarea id="counsel-text" style="width:100%; height:100px; margin-bottom:10px;" placeholder="상담 내용"></textarea>
+            <textarea id="counsel-text" style="width:100%; height:100px; margin-bottom:10px;" placeholder="상담 내용을 입력하세요"></textarea>
             <button class="btn-add" onclick="saveCounsel()">상담 저장</button>
             <div id="counsel-list" style="margin-top:20px; display:flex; flex-direction:column; gap:10px;"></div>
         </div>
     </section>
 
     <section id="tab-settings" class="tab-panel">
-        <h1>⚙️ 설정</h1>
+        <h1>⚙️ 설정 및 백업</h1>
+        
+        <div class="card">
+            <h3>데이터 안전 관리 (백업/복원)</h3>
+            <p style="font-size:0.85rem; color:#666; margin-bottom:15px;">컴퓨터를 포맷하거나 캐시를 지우면 데이터가 삭제됩니다. 주기적으로 백업 파일을 저장해 주세요.</p>
+            <div style="display:flex; gap:10px;">
+                <button class="btn-add" onclick="exportBackup()">📥 현재 데이터 백업 (다운로드)</button>
+                <input type="file" id="backup-file" accept=".json" style="display:none" onchange="importBackup(this)">
+                <button class="btn-outline" onclick="document.getElementById('backup-file').click()">📤 백업 파일 불러오기</button>
+            </div>
+        </div>
+
         <div class="card">
             <h3>메뉴 및 과목 설정</h3>
             <div id="menu-settings-list" style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;"></div>
-            <label style="font-size:0.75rem; color:#999;">과목 (쉼표 구분)</label><br>
+            <label style="font-size:0.75rem; color:#999; font-weight:bold;">과목 (쉼표 구분)</label><br>
             <textarea id="subject-setting" style="width:100%; height:60px;"></textarea>
-            <button class="btn-add" style="margin-top:10px;" onclick="saveSettings()">설정 적용</button>
+            <button class="btn-outline" style="margin-top:10px;" onclick="saveSettings()">설정 적용</button>
         </div>
-        <div class="card" style="border-color: #ddd;">
-            <h3>데이터 관리</h3>
-            <button class="btn-danger" onclick="resetAllData()">전체 데이터 초기화</button>
+
+        <div class="card" style="border: 1px solid #e0e0e0; background: #fafafa;">
+            <h3>위험 구역</h3>
+            <button class="btn-danger" onclick="resetAllData()">전체 데이터 영구 삭제</button>
         </div>
     </section>
 </main>
 
 <script>
-    // 유틸리티: 날짜를 YYYY-MM-DD 형식으로 포맷팅 (0 패딩 포함)
     const formatDate = (y, m, d) => `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
     const getMonthKey = (y, m) => `${y}-${String(m + 1).padStart(2, '0')}`;
 
     const defaultData = {
-        title: "스마트 학급일지 PRO",
+        title: "스마트 학급일지 PRO+",
         menuNames: { students: "🌷 학생 관리", schedule: "📅 연간 일정", attendance: "✅ 출석 기록", evaluation: "📝 평가 기록", counsel: "💬 상담 기록" },
         subjects: ["국어", "수학", "사회", "과학", "영어", "창체"],
         students: [], events: {}, counsels: [], attnData: {}, evalData: {}, weeklyMemos: {}
     };
 
-    let db = JSON.parse(localStorage.getItem('smartDiary_v19')) || defaultData;
+    let db = JSON.parse(localStorage.getItem('smartDiary_v20')) || defaultData;
     const today = new Date();
     let curCal = { y: today.getFullYear(), m: today.getMonth() };
 
@@ -172,7 +198,7 @@
     };
 
     function saveDB() {
-        localStorage.setItem('smartDiary_v19', JSON.stringify(db));
+        localStorage.setItem('smartDiary_v20', JSON.stringify(db));
         updateUI();
     }
 
@@ -180,7 +206,7 @@
         document.getElementById('app-title').textContent = db.title;
         document.title = db.title;
 
-        // 사이드바 및 메뉴 이름
+        // 사이드바
         const sidebar = document.getElementById('sidebar-menus');
         sidebar.innerHTML = '';
         Object.keys(db.menuNames).forEach(key => {
@@ -194,7 +220,7 @@
             if(titleEl) titleEl.textContent = db.menuNames[key];
         });
 
-        // 과목 설정
+        // 과목
         const evalSub = document.getElementById('eval-subject');
         evalSub.innerHTML = '';
         db.subjects.forEach(s => {
@@ -203,21 +229,21 @@
             evalSub.appendChild(opt);
         });
 
-        // 학생 목록 (보안 강화: textContent 사용)
+        // 학생 목록
         const listDisp = document.getElementById('student-list-display');
         listDisp.innerHTML = '';
+        if(db.students.length === 0) {
+            listDisp.innerHTML = `<span style="color:#aaa; font-size:0.9rem;">등록된 학생이 없습니다. 이름을 추가해 주세요.</span>`;
+        }
         db.students.forEach((s, i) => {
             const div = document.createElement('div');
-            div.className = 'card';
-            div.style.cssText = 'padding:10px; display:flex; align-items:center; gap:8px; margin-bottom:0; border-radius:10px;';
-            
+            div.style.cssText = 'padding:8px 12px; border:1px solid #eee; background:#fff; display:flex; align-items:center; gap:8px; border-radius:8px; font-size:0.9rem;';
             const b = document.createElement('b'); b.textContent = i + 1;
             const spanName = document.createElement('span'); spanName.textContent = s;
             const del = document.createElement('span');
             del.textContent = '×';
-            del.style.cssText = 'color:#999; cursor:pointer; margin-left:5px; font-weight:bold;';
+            del.style.cssText = 'color:#ccc; cursor:pointer; margin-left:5px; font-weight:bold;';
             del.onclick = () => removeStudent(i);
-
             div.append(b, spanName, del);
             listDisp.appendChild(div);
         });
@@ -235,38 +261,100 @@
         refreshCounselList();
     }
 
-    // 학생 관리 (중복 체크 추가)
+    /* --- 신규: 엑셀(CSV) 다운로드 기능 --- */
+    function downloadCSV(tableId, filenamePrefix) {
+        const table = document.getElementById(tableId);
+        let csv = [];
+        // 날짜나 주제를 파일명에 포함
+        let dateOrTopic = "";
+        if(tableId === 'attn-table') dateOrTopic = "_" + document.getElementById('attn-date').value;
+        if(tableId === 'eval-table') {
+            const sub = document.getElementById('eval-subject').value;
+            const topic = document.getElementById('eval-topic').value;
+            dateOrTopic = "_" + sub + (topic ? "_" + topic : "");
+        }
+
+        for (let i = 0; i < table.rows.length; i++) {
+            let row = [], cols = table.rows[i].querySelectorAll("td, th");
+            for (let j = 0; j < cols.length; j++) {
+                let text = cols[j].textContent || cols[j].innerText;
+                const input = cols[j].querySelector('input, select');
+                if(input) {
+                    if(input.type === 'checkbox') text = input.checked ? 'O' : 'X';
+                    else text = input.value;
+                }
+                // 따옴표 처리 및 쉼표 포함 문자열 보호
+                row.push('"' + text.replace(/"/g, '""') + '"');
+            }
+            csv.push(row.join(","));
+        }
+        
+        // 한글 깨짐 방지를 위한 BOM 추가
+        const csvFile = new Blob(["\ufeff" + csv.join("\n")], {type: "text/csv;charset=utf-8;"});
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(csvFile);
+        link.download = filenamePrefix + dateOrTopic + ".csv";
+        link.click();
+    }
+
+    /* --- 신규: 백업 및 복원 기능 --- */
+    function exportBackup() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
+        const dlAnchorElem = document.createElement('a');
+        dlAnchorElem.setAttribute("href", dataStr);
+        const dateStr = formatDate(today.getFullYear(), today.getMonth(), today.getDate());
+        dlAnchorElem.setAttribute("download", `학급일지_백업_${dateStr}.json`);
+        dlAnchorElem.click();
+    }
+
+    function importBackup(input) {
+        const file = input.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const importedData = JSON.parse(e.target.result);
+                if(importedData && importedData.students) { // 기본 검증
+                    db = importedData;
+                    saveDB();
+                    alert("데이터가 성공적으로 복원되었습니다.");
+                } else {
+                    alert("유효한 백업 파일이 아닙니다.");
+                }
+            } catch(err) { alert("파일을 읽는 중 오류가 발생했습니다."); }
+        };
+        reader.readAsText(file);
+        input.value = ""; // 초기화
+    }
+
     function addStudent() {
         const input = document.getElementById('new-name');
         const name = input.value.trim();
         if(!name) return;
-        if(db.students.includes(name)) {
-            alert("이미 등록된 학생입니다.");
-            return;
-        }
+        if(db.students.includes(name)) { alert("이미 등록된 학생입니다."); return; }
         db.students.push(name);
         input.value = "";
         saveDB();
     }
 
     function removeStudent(i) {
-        if(confirm("해당 학생을 삭제하시겠습니까? 관련 기록은 유지되나 목록에서 제외됩니다.")) {
-            db.students.splice(i, 1);
-            saveDB();
-        }
+        if(confirm("해당 학생을 명단에서 삭제할까요?")) { db.students.splice(i, 1); saveDB(); }
     }
 
-    // 출석 (textContent로 보안 강화)
     function renderAttendanceTable() {
         const date = document.getElementById('attn-date').value;
         const saved = db.attnData[date] || {};
         const tbody = document.querySelector('#attn-table tbody');
         tbody.innerHTML = '';
+        if(db.students.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="color:#aaa;">명단 관리에서 학생을 먼저 추가해주세요.</td></tr>`;
+            return;
+        }
         db.students.forEach((s, i) => {
             const d = saved[s] || { type: '출석', note: '', doc: false };
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${i+1}</td><td class="name-cell"></td>
-                <td><select class="at-type"><option>출석</option><option>질병결석</option><option>인정결석</option><option>무단결석</option></select></td>
+            tr.innerHTML = `<td>${i+1}</td><td class="name-cell" style="font-weight:bold;"></td>
+                <td><select class="at-type"><option>출석</option><option>질병결석</option><option>인정결석</option><option>미인정결석</option><option>기타결석</option></select></td>
                 <td><input type="text" class="at-note" style="width:90%"></td>
                 <td><input type="checkbox" class="at-doc"></td>`;
             tr.querySelector('.name-cell').textContent = s;
@@ -281,7 +369,9 @@
         const date = document.getElementById('attn-date').value;
         db.attnData[date] = {};
         document.querySelectorAll('#attn-table tbody tr').forEach(row => {
-            const name = row.querySelector('.name-cell').textContent;
+            const nameCell = row.querySelector('.name-cell');
+            if(!nameCell) return;
+            const name = nameCell.textContent;
             db.attnData[date][name] = {
                 type: row.querySelector('.at-type').value,
                 note: row.querySelector('.at-note').value,
@@ -291,7 +381,6 @@
         saveDB(); alert("저장되었습니다.");
     }
 
-    // 평가 (키 구조 개선: 주제 필수)
     function renderEvaluationTable() {
         const sub = document.getElementById('eval-subject').value;
         const topic = document.getElementById('eval-topic').value.trim();
@@ -299,10 +388,14 @@
         const saved = db.evalData[key] || {};
         const tbody = document.querySelector('#eval-table tbody');
         tbody.innerHTML = '';
+        if(db.students.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="color:#aaa;">명단 관리에서 학생을 먼저 추가해주세요.</td></tr>`;
+            return;
+        }
         db.students.forEach((s, i) => {
             const d = saved[s] || { score: '매우잘함', note: '' };
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${i+1}</td><td class="name-cell"></td>
+            tr.innerHTML = `<td>${i+1}</td><td class="name-cell" style="font-weight:bold;"></td>
                 <td><select class="ev-score"><option>매우잘함</option><option>잘함</option><option>보통</option><option>노력요함</option></select></td>
                 <td><input type="text" class="ev-note" style="width:90%"></td>`;
             tr.querySelector('.name-cell').textContent = s;
@@ -315,11 +408,13 @@
     function saveEvaluation() {
         const sub = document.getElementById('eval-subject').value;
         const topic = document.getElementById('eval-topic').value.trim();
-        if(!topic) { alert("평가 주제를 입력해주세요."); return; }
+        if(!topic) { alert("저장 전 '평가 주제'를 반드시 입력해주세요."); document.getElementById('eval-topic').focus(); return; }
         const key = sub + "_" + topic;
         db.evalData[key] = {};
         document.querySelectorAll('#eval-table tbody tr').forEach(row => {
-            const name = row.querySelector('.name-cell').textContent;
+            const nameCell = row.querySelector('.name-cell');
+            if(!nameCell) return;
+            const name = nameCell.textContent;
             db.evalData[key][name] = {
                 score: row.querySelector('.ev-score').value,
                 note: row.querySelector('.ev-note').value
@@ -328,7 +423,6 @@
         saveDB(); alert("평가 결과가 저장되었습니다.");
     }
 
-    // 달력 및 주간 메모 (주간 메모 기능 추가)
     function renderCal() {
         const grid = document.getElementById('calendar-grid');
         document.getElementById('cal-title').textContent = `${curCal.y}년 ${curCal.m + 1}월`;
@@ -337,7 +431,7 @@
         const last = new Date(curCal.y, curCal.m + 1, 0).getDate();
         ['일','월','화','수','목','금','토'].forEach(d => {
             const div = document.createElement('div');
-            div.style.cssText = 'text-align:center; font-size:0.75rem; color:#bbb;';
+            div.style.cssText = 'text-align:center; font-size:0.75rem; color:#bbb; padding-bottom:5px;';
             div.textContent = d;
             grid.appendChild(div);
         });
@@ -375,16 +469,17 @@
             group.querySelector('textarea').onchange = (e) => {
                 if(!db.weeklyMemos[monthKey]) db.weeklyMemos[monthKey] = ["", "", "", "", ""];
                 db.weeklyMemos[monthKey][i] = e.target.value;
-                localStorage.setItem('smartDiary_v19', JSON.stringify(db));
+                localStorage.setItem('smartDiary_v20', JSON.stringify(db));
             };
             container.appendChild(group);
         }
     }
 
     function moveMonth(n) { curCal.m += n; if(curCal.m<0){curCal.m=11;curCal.y--;} else if(curCal.m>11){curCal.m=0;curCal.y++;} renderCal(); }
-    function addEvent(d) { const val = prompt("일정 입력", db.events[d]||""); if(val!==null){db.events[d]=val; saveDB(); renderCal();}}
+    /* 신규: 오늘로 돌아가기 */
+    function goToToday() { curCal = { y: today.getFullYear(), m: today.getMonth() }; renderCal(); }
+    function addEvent(d) { const val = prompt(`${d} 일정 입력`, db.events[d]||""); if(val!==null){ if(val.trim()==="") delete db.events[d]; else db.events[d]=val; saveDB(); renderCal();} }
 
-    // 상담 기록
     function saveCounsel() {
         const text = document.getElementById('counsel-text').value.trim();
         if(!text) return;
@@ -396,22 +491,20 @@
         list.innerHTML = '';
         db.counsels.slice().reverse().forEach(c => {
             const div = document.createElement('div');
-            div.className = 'card';
-            div.style.cssText = 'font-size:0.85rem; margin-bottom:0; border-radius:12px;';
+            div.style.cssText = 'font-size:0.85rem; padding:15px; background:#fafafa; border-radius:12px; border:1px solid #eee;';
             const b = document.createElement('b'); b.textContent = `${c.date} [${c.name}]`;
-            const p = document.createElement('p'); p.style.cssText = 'margin:5px 0 0 0; color:#555;'; p.textContent = c.text;
+            const p = document.createElement('p'); p.style.cssText = 'margin:8px 0 0 0; color:#444; line-height:1.4;'; p.textContent = c.text;
             div.append(b, p);
             list.appendChild(div);
         });
     }
 
-    // 설정 및 공통
     function initSettingsUI() {
         const menuList = document.getElementById('menu-settings-list');
         menuList.innerHTML = '';
         Object.keys(db.menuNames).forEach(key => {
             const div = document.createElement('div');
-            div.innerHTML = `<label style="font-size:0.75rem; color:#999;">${key}</label><br>
+            div.innerHTML = `<label style="font-size:0.75rem; color:#999; font-weight:bold;">${key} 탭 이름</label><br>
                 <input type="text" id="set-menu-${key}" value="${db.menuNames[key]}" style="width:90%">`;
             menuList.appendChild(div);
         });
@@ -421,7 +514,7 @@
     function saveSettings() {
         Object.keys(db.menuNames).forEach(key => { db.menuNames[key] = document.getElementById(`set-menu-${key}`).value; });
         db.subjects = document.getElementById('subject-setting').value.split(",").map(s => s.trim()).filter(s => s);
-        saveDB(); alert("설정이 적용되었습니다.");
+        saveDB(); alert("설정이 성공적으로 적용되었습니다.");
     }
 
     function openTab(e, id) {
@@ -436,13 +529,14 @@
         reader.onload = (e) => {
             const names = e.target.result.split(/[\n,]/).map(n => n.trim().replace(/^[0-9]+[\.\-\s]*/g, '')).filter(n => n);
             db.students = [...new Set([...db.students, ...names])];
-            saveDB(); alert("가져오기 완료");
+            saveDB(); alert("명단 가져오기가 완료되었습니다.");
         };
         reader.readAsText(input.files[0]);
+        input.value = ""; 
     }
 
-    function resetAllData() { if(confirm("모든 데이터를 초기화하시겠습니까?")) { localStorage.removeItem('smartDiary_v19'); location.reload(); } }
-    function editTitle() { const t = prompt("제목 수정", db.title); if(t) { db.title = t; saveDB(); } }
+    function resetAllData() { if(confirm("⚠️ 경고: 모든 데이터가 영구적으로 삭제됩니다. 백업은 하셨나요? 정말 초기화하시겠습니까?")) { localStorage.removeItem('smartDiary_v20'); location.reload(); } }
+    function editTitle() { const t = prompt("학급일지 메인 타이틀을 입력하세요.", db.title); if(t && t.trim()!=="") { db.title = t; saveDB(); } }
 </script>
 </body>
 </html>
